@@ -342,6 +342,7 @@ typedef struct {
 #define EM_NUM		248
 
 #define EM_ALPHA	0x9026
+#define EM_SNOWHOUSECPU_UNOFFICIAL	0xfeef
 
 #define EV_NONE		0
 #define EV_CURRENT	1

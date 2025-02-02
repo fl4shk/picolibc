@@ -461,6 +461,10 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #endif
 #endif
 
+#ifdef __snowhousecpu__
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
 #ifdef __ia64__
 #ifdef __BIG_ENDIAN__
 #define __IEEE_BIG_ENDIAN
