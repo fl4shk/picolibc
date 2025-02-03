@@ -176,6 +176,11 @@ _BEGIN_STD_C
 #endif /* __SH5__ */
 #endif
 
+#ifdef __snowhousecpu__
+#define _JBLEN 0x24
+#define _JBTYPE long
+#endif
+
 #ifdef  __v800
 #define _JBLEN 28
 #endif
