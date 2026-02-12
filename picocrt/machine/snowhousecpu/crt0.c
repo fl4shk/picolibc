@@ -19,5 +19,5 @@ void _section(".init") __attribute__((used))
 _start(void)
 {
     // Initialize 
-    __asm__("cpy %0, %%
+    __asm__("cpy %0, %");
 }

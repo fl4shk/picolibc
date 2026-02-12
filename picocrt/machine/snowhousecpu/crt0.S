@@ -11,6 +11,8 @@
 .global _start
 .type _start,@function
 _start:
+    cpy r0, r0
+    cpy r0, r0
     cpy sp, _stack
     //cpy r1, _interrupt_vector
     //cpy ids, r1

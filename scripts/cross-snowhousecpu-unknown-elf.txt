@@ -6,7 +6,7 @@
 c = ['snowhousecpu-unknown-elf-gcc', '-nostdlib']
 cpp = ['snowhousecpu-unknown-elf-g++', '-nostdlib']
 ar = 'snowhousecpu-unknown-elf-ar'
-as = 'snowhousecpu-unknown-elf-as'
+as = ['snowhousecpu-unknown-elf-gcc']
 nm = 'snowhousecpu-unknown-elf-nm'
 strip = 'snowhousecpu-unknown-elf-strip'
 # only needed to run tests
@@ -17,6 +17,10 @@ system = 'none'
 cpu_family = 'snowhousecpu'
 cpu = 'snowhousecpu'
 endian = 'little'
+
+[built-in options]
+c_link_args = ['-Wl,--relax']
+cpp_link_args = ['-Wl,--relax']
 
 [properties]
 skip_sanity_check = true
