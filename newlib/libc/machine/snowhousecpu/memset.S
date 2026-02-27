@@ -10,7 +10,7 @@ _memset:
 
     and r2, r2, 0xff        // \ this trick with AND and multiplication
     cpy r5, 0x01010101      // | duplicates the low byte
-    mul r5, r5, r2          // / into all the other bytes
+    umulw r5, r5, r2          // / into all the other bytes
 
     and r6, r3, ~0x3        // r6 = dst + cnt - non word aligned num bytes
     add r6, r1, r6          //
