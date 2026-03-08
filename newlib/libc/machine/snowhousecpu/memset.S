@@ -23,7 +23,6 @@ _memset:
 .Lmemset_words_loop:
     str r5, r4, 0
     add r4, r4, 4
-    add r5, r5, 4
     bne r4, r6, .Lmemset_words_loop
 
 .Lmemset_remaining_bytes_loop_pre:
