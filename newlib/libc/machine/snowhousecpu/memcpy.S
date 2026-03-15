@@ -6,8 +6,12 @@
 _memcpy:
     beq r3, r0, .Lmemcpy_end    // if cnt == 0 then return;
 
+    add sp, sp, -4
+    str r7, sp, 0
+
     cpy r4, r1              // r4 = dst
     cpy r5, r2              // r5 = src
+    cpy r7, r3
 
     and r6, r3, ~0x3        // r6 = dst + cnt - non word aligned num bytes
     add r6, r1, r6          //
@@ -17,6 +21,9 @@ _memcpy:
     or r2, r1, r2           // same result as the following:
     and r2, r2, 0x3         // (dst & 0x3) == 0 && (src & 0x3) == 0
     bne r2, r0, .Lmemcpy_remaining_bytes_loop
+
+    cpy r2, 4
+    bltu r7, r2, .Lmemcpy_remaining_bytes_loop
 
 .Lmemcpy_words_loop:
     ldr r2, r5, 0
@@ -34,6 +41,10 @@ _memcpy:
     add r4, r4, 1
     add r5, r5, 1
     bne r4, r3, .Lmemcpy_remaining_bytes_loop
+
+.Lmemcpy_pop:
+    ldr r7, sp, 0
+    add sp, sp, 4
 
 .Lmemcpy_end:
     jmp lr
