@@ -33,7 +33,7 @@ _memset:
     bne r4, r6, .Lmemset_words_loop
 
 .Lmemset_remaining_bytes_loop_pre:
-    beq r6, r3, .Lmemset_end
+    beq r6, r3, .Lmemset_pop
 
 .Lmemset_remaining_bytes_loop:
     stb r5, r4, 0

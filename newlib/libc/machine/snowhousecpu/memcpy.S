@@ -33,7 +33,7 @@ _memcpy:
     bne r4, r6, .Lmemcpy_words_loop
 
 .Lmemcpy_remaining_bytes_loop_pre:
-    beq r6, r3, .Lmemcpy_end
+    beq r6, r3, .Lmemcpy_pop
 
 .Lmemcpy_remaining_bytes_loop:
     ldub r2, r5, 0
