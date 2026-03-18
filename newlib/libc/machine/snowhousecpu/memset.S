@@ -27,6 +27,23 @@ _memset:
     cpy r2, 4
     bltu r7, r2, .Lmemset_remaining_bytes_loop
 
+//    cpy r2, 16
+//    bltu r7, r2, .Lmemset_words_loop
+//
+//    and r2, r7, ~0xf        // r7 = dst + cnt - non 16-bytes aligned amount
+//    add r7, r5, r2          //
+//
+//.Lmemset_words_x4_loop:
+//    str r5, r4, 0
+//    str r5, r4, 4
+//    str r5, r4, 8
+//    str r5, r4, 12
+//    add r4, r4, 16
+//    bne r4, r7, .Lmemset_words_x4_loop
+
+.Lmemset_words_x4_loop_post:
+    beq r7, r3, .Lmemset_pop
+
 .Lmemset_words_loop:
     str r5, r4, 0
     add r4, r4, 4

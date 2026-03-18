@@ -8,6 +8,7 @@ _memcpy:
 
     add sp, sp, -4
     str r7, sp, 0
+    //str r8, sp, 4
 
     cpy r4, r1              // r4 = dst
     cpy r5, r2              // r5 = src
@@ -24,6 +25,28 @@ _memcpy:
 
     cpy r2, 4
     bltu r7, r2, .Lmemcpy_remaining_bytes_loop
+
+//    cpy r2, 16
+//    bltu r7, r2, .Lmemcpy_words_loop
+//
+//    and r2, r7, ~0xf        // r7 = dst + cnt - non 16-bytes aligned amount
+//    add r7, r5, r2          //
+//
+//.Lmemcpy_words_x4_loop:
+//    ldr r2, r5, 0
+//    str r2, r4, 0
+//    ldr r2, r5, 4
+//    str r2, r4, 4
+//    ldr r2, r5, 8
+//    str r2, r4, 8
+//    ldr r2, r5, 12
+//    str r2, r4, 12
+//    add r5, r5, 16
+//    add r4, r4, 16
+//    bne r4, r7, .Lmemcpy_words_x4_loop
+
+.Lmemcpy_words_x4_loop_post:
+    beq r7, r3, .Lmemcpy_pop
 
 .Lmemcpy_words_loop:
     ldr r2, r5, 0
@@ -44,6 +67,7 @@ _memcpy:
 
 .Lmemcpy_pop:
     ldr r7, sp, 0
+    //ldr r8, sp, 0
     add sp, sp, 4
 
 .Lmemcpy_end:
