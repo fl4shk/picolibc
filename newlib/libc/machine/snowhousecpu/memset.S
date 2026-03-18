@@ -1,13 +1,15 @@
 // A memset for SnowHouseCpu
 //  Written by Andrew Clark (FL4SHK)
+.set stack_space, 4
 .text
 .global _memset
 .type   _memset,@function
 _memset:
     beq r3, r0, .Lmemset_end    // if cnt == 0 then return;
 
-    add sp, sp, -4
+    add sp, sp, -stack_space
     str r7, sp, 0
+    //str r8, sp, 4
 
     cpy r4, r1              // r4 = dst
     cpy r6, r3              // r6 = cnt
@@ -43,6 +45,7 @@ _memset:
 
 .Lmemset_words_x4_loop_post:
     beq r6, r3, .Lmemset_pop
+    bne r7, r3, .Lmemset_remaining_bytes_loop
 
 .Lmemset_words_loop:
     str r5, r4, 0
@@ -59,7 +62,8 @@ _memset:
 
 .Lmemset_pop:
     ldr r7, sp, 0
-    add sp, sp, 4
+    //ldr r8, sp, 4
+    add sp, sp, stack_space
 
 .Lmemset_end:
     jmp lr
