@@ -30,8 +30,8 @@ _memset:
     cpy r2, 16
     bltu r6, r2, .Lmemset_words_loop
 
-    and r2, r3, ~0xf        // r6 = dst + cnt - non 16-bytes aligned amount
-    add r6, r5, r2          //
+    and r6, r3, ~0xf    // r6 = dst + cnt - non 16-bytes aligned amount
+    add r6, r4, r6      //
 
 .Lmemset_words_x4_loop:
     str r5, r4, 0
