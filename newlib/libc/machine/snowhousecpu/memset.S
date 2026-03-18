@@ -10,14 +10,14 @@ _memset:
     str r7, sp, 0
 
     cpy r4, r1              // r4 = dst
-    cpy r7, r3              // r6 = cnt
+    cpy r6, r3              // r6 = cnt
 
     and r2, r2, 0xff        // \ this trick with AND and multiplication
     cpy r5, 0x01010101      // | duplicates the low byte
     umulw r5, r5, r2        // / into all the other bytes
 
-    and r6, r3, ~0x3        // r6 = dst + cnt - non word aligned num bytes
-    add r6, r1, r6          //
+    and r7, r3, ~0x3        // r7 = dst + cnt - non word aligned num bytes
+    add r7, r1, r7          //
 
     add r3, r1, r3          // r3 = dst + cnt
 
@@ -25,32 +25,32 @@ _memset:
     bne r2, r0, .Lmemset_remaining_bytes_loop
 
     cpy r2, 4
-    bltu r7, r2, .Lmemset_remaining_bytes_loop
+    bltu r6, r2, .Lmemset_remaining_bytes_loop
 
-//    cpy r2, 16
-//    bltu r7, r2, .Lmemset_words_loop
-//
-//    and r2, r7, ~0xf        // r7 = dst + cnt - non 16-bytes aligned amount
-//    add r7, r5, r2          //
-//
-//.Lmemset_words_x4_loop:
-//    str r5, r4, 0
-//    str r5, r4, 4
-//    str r5, r4, 8
-//    str r5, r4, 12
-//    add r4, r4, 16
-//    bne r4, r7, .Lmemset_words_x4_loop
+    cpy r2, 16
+    bltu r6, r2, .Lmemset_words_loop
+
+    and r2, r3, ~0xf        // r6 = dst + cnt - non 16-bytes aligned amount
+    add r6, r5, r2          //
+
+.Lmemset_words_x4_loop:
+    str r5, r4, 0
+    str r5, r4, 4
+    str r5, r4, 8
+    str r5, r4, 12
+    add r4, r4, 16
+    bne r4, r6, .Lmemset_words_x4_loop
 
 .Lmemset_words_x4_loop_post:
-    beq r7, r3, .Lmemset_pop
+    beq r6, r3, .Lmemset_pop
 
 .Lmemset_words_loop:
     str r5, r4, 0
     add r4, r4, 4
-    bne r4, r6, .Lmemset_words_loop
+    bne r4, r7, .Lmemset_words_loop
 
 .Lmemset_remaining_bytes_loop_pre:
-    beq r6, r3, .Lmemset_pop
+    beq r7, r3, .Lmemset_pop
 
 .Lmemset_remaining_bytes_loop:
     stb r5, r4, 0
