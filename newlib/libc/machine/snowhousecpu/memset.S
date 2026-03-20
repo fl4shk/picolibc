@@ -1,6 +1,7 @@
 // A memset for SnowHouseCpu
 //  Written by Andrew Clark (FL4SHK)
-.set stack_space, 4
+.altmacro
+.set stack_space, 8
 .text
 .global _memset
 .type   _memset,@function
@@ -9,10 +10,11 @@ _memset:
 
     add sp, sp, -stack_space
     str r7, sp, 0
-    //str r8, sp, 4
+    str r8, sp, 4
 
     cpy r4, r1              // r4 = dst
     cpy r6, r3              // r6 = cnt
+    cpy r8, r3
 
     and r2, r2, 0xff        // \ this trick with AND and multiplication
     cpy r5, 0x01010101      // | duplicates the low byte
@@ -30,9 +32,31 @@ _memset:
     bltu r6, r2, .Lmemset_remaining_bytes_loop
 
     cpy r2, 16
-    bltu r6, r2, .Lmemset_words_loop
+    bltu r6, r2, .Lmemset_remaining_words_loop
 
-    and r6, r6, ~0xf    // r6 = dst + cnt - non 16-bytes aligned amount
+    cpy r2, 64  // 16 * 4 = 64, a good fit for snowhousecpu with
+                // its 64-bytes-long data cache lines
+    bltu r6, r2, .Lmemset_words_x4_loop_pre
+
+    and r6, r6, ~0x3f
+    add r6, r4, r6
+
+.Lmemset_words_x16_loop:
+    .set i, 0
+    .rept 16
+        str r5, r4, i
+        .set i, i + 4
+    .endr
+    add r4, r4, 64
+    bne r4, r6, .Lmemset_words_x16_loop
+
+.Lmemset_words_x16_loop_post:
+    beq r6, r3, .Lmemset_pop
+    beq r7, r3, .Lmemset_remaining_words_loop
+    bl r0, .Lmemset_remaining_bytes_loop
+
+.Lmemset_words_x4_loop_pre:
+    and r6, r8, ~0xf    // r6 = dst + cnt - non 16-bytes aligned amount
     add r6, r4, r6      //
 
 .Lmemset_words_x4_loop:
@@ -47,10 +71,10 @@ _memset:
     beq r6, r3, .Lmemset_pop
     bne r7, r3, .Lmemset_remaining_bytes_loop
 
-.Lmemset_words_loop:
+.Lmemset_remaining_words_loop:
     str r5, r4, 0
     add r4, r4, 4
-    bne r4, r7, .Lmemset_words_loop
+    bne r4, r7, .Lmemset_remaining_words_loop
 
 .Lmemset_remaining_bytes_loop_pre:
     beq r7, r3, .Lmemset_pop
@@ -62,7 +86,7 @@ _memset:
 
 .Lmemset_pop:
     ldr r7, sp, 0
-    //ldr r8, sp, 4
+    ldr r8, sp, 4
     add sp, sp, stack_space
 
 .Lmemset_end:

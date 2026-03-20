@@ -1,5 +1,6 @@
 // A memcpy for SnowHouseCpu
 //  Written by Andrew Clark (FL4SHK)
+.altmacro
 
 .macro mac_memcpy_bytes_loop tmp, dst, src, to_cmp
 .L\@_mac_mac_memcpy_bytes_loop:
@@ -23,7 +24,7 @@
     bne \dst, \to_cmp, .L\@_mac_memcpy_words_loop
 .endm
 
-.set stack_space, 4
+.set stack_space, 8
 
 .text
 .global _memcpy
@@ -33,13 +34,14 @@ _memcpy:
 
     add sp, sp, -stack_space
     str r7, sp, 0
-    //str r8, sp, 4
+    str r8, sp, 4
     //str lr, sp, 4
     //str r8, sp, 4
 
     cpy r4, r1              // r4 = dst
     cpy r5, r2              // r5 = src
     cpy r6, r3              // r6 = cnt
+    cpy r8, r3
 
     and r7, r3, ~0x3        // r7 = dst + cnt - non word aligned num bytes
     add r7, r1, r7          //
@@ -57,8 +59,31 @@ _memcpy:
     bltu r6, r2, .Lmemcpy_remaining_words_loop
 
     //cpy r8, r6
+    cpy r2, 64  // 16 * 4 = 64, a good fit for snowhousecpu with
+                // its 64-bytes-long data cache lines
+    bltu r6, r2, .Lmemcpy_words_x4_loop_pre
 
-    and r6, r6, ~0xf    // r6 = dst + cnt - non 16-bytes aligned amount
+    and r6, r6, ~0x3f // ~(64 - 1)
+    add r6, r4, r6
+
+.Lmemcpy_words_x16_loop:
+    .set i, 0
+    .rept 16
+        ldr r2, r5, i
+        str r2, r4, i
+        .set i, i + 4
+    .endr
+    add r4, r4, 64
+    add r5, r5, 64
+    bne r4, r6, .Lmemcpy_words_x16_loop
+
+.Lmemcpy_words_x16_loop_post:
+    beq r6, r3, .Lmemcpy_pop
+    beq r7, r3, .Lmemcpy_remaining_words_loop
+    bl r0, .Lmemcpy_remaining_bytes_loop
+
+.Lmemcpy_words_x4_loop_pre:
+    and r6, r8, ~0xf    // r6 = dst + cnt - non 16-bytes aligned amount
     add r6, r4, r6      //
 
 .Lmemcpy_words_x4_loop:
@@ -102,7 +127,7 @@ mac_memcpy_bytes_loop r2, r4, r5, r3
 .Lmemcpy_pop:
     ldr r7, sp, 0
     //ldr lr, sp, 4
-    //ldr r8, sp, 0
+    ldr r8, sp, 4
     add sp, sp, stack_space
 
 .Lmemcpy_end:
