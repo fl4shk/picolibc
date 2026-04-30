@@ -41,6 +41,7 @@
 //  lr                  0x18
 //  fp                  0x1c
 //  sp                  0x20
+//  hi                  0x24
 
 .text
 .global _setjmp
@@ -56,6 +57,9 @@ _setjmp:
     str lr, r1, 0x18
     str fp, r1, 0x1c
     str sp, r1, 0x20
+    cpy r7, hi
+    str r7, r1, 0x24
+    ldr r7, r1, 0x0
     cpy r1, 0
     jmp lr
 .Lend1:
@@ -64,6 +68,8 @@ _setjmp:
 .global _longjmp
 .type _longjmp,@function
 _longjmp:
+    ldr r7, r2, 0x24
+    cpy hi, r7
     ldr r7, r2, 0x00
     ldr r8, r2, 0x04
     ldr r9, r2, 0x08
@@ -73,7 +79,7 @@ _longjmp:
     ldr lr, r2, 0x18
     ldr fp, r2, 0x1c
     ldr sp, r2, 0x20
-    // return the resut argument, or 1 if it is zero
+    // return the result argument, or 1 if it is zero
     cpy r1, r2
     beq r1, r0, .Lreturn1
     jmp lr
