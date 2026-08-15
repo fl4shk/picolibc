@@ -2,8 +2,33 @@
 //  Written by Andrew Clark (FL4SHK)
 
 
+//// Stack frame setup:
+//// High
+////                    ------------------------
+////                    last on-stack parameter
+////                    on-stack parameters (args grow upwards)...
+//// old sp, fake_ap, dwarf cfa, on-stack parameter 0x0
+////                    ------------------------
+//// fake_fp            old fp (if `frame_pointer_needed`)
+////                    ------------------------
+//// fp,                callee-saved register save 0x0
+////                    callee-saved registers save area...
+////                    last callee-saved register save
+////                    ------------------------
+////                    local variable save area
+////                    ------------------------
+////                    padding for alignment
+////                    ------------------------
+////                    last outgoing arg
+////                    outgoing args (args grow upward)...
+////                    outgoing arg 0x0
+////                    (and sometimes dynamically allocated object on the 
+////                    stack)
+//// sp
+//// Low
+
 // Stack frame setup:
-// High
+// High (greater address?)
 //                    ------------------------
 //                    last on-stack parameter
 //                    on-stack parameters (args grow upwards)...
@@ -22,10 +47,12 @@
 //                    last outgoing arg
 //                    outgoing args (args grow upward)...
 //                    outgoing arg 0x0
-//                    (and sometimes dynamically allocated object on the 
-//                    stack)
+//                    ------------------------
+//                    SOMETIMES: dynamically allocated space on the 
+//                    stack
+//                    ------------------------
 // sp
-// Low
+// Low (lower address?)
 
 #include <picolibc.h>
 

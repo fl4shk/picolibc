@@ -1065,6 +1065,9 @@ foreach params : [default_target] + targets
   target_lib_prefix = params['lib_prefix']
 
   custom_mem_config = ''
+  #if target == 'riscv'
+    message('testificate: ' + target)
+  #endif
 
   if target != 'default-target'
     target_part = ''
@@ -1081,10 +1084,17 @@ foreach params : [default_target] + targets
 
   custom_mem_config = meson.get_cross_property('custom_mem_config' + target, custom_mem_config)
 
+  #if host_cpu_family == 'snowhousecpu'
+  #  c_args += ['-Wl,--relax']
+  #endif
+
   if target == 'default-target' or custom_mem_config != ''
-    if host_cpu_family == 'snowhousecpu'
-      c_args += ['-Wl,--relax']
+    if target == 'snowhousecpu'
+        c_args += ['-Wl,--relax']
+    #elif target == 'riscv'
+    #    c_args += ['-O2', '-march=rv32imac', '-mabi=ilp32']
     endif
+
 
     picolibc_linker_type_data = configuration_data()
     # We need to use different alignment flags for .tdata/.tbss for ld.bfd
